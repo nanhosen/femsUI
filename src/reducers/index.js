@@ -2,7 +2,8 @@ import { combineReducers } from 'redux'
 import latestDataReducer from './getLatestDataReducer'
 // import randomReducer from './getRandomReducer'
 import keplerGlReducer from 'kepler.gl/reducers'
-
+// import 
+// this is from this example: https://github.com/keplergl/kepler.gl/blob/master/examples/custom-reducer/src/store.js
 const customizedKeplerGlReducer = keplerGlReducer
   .initialState({
   	mapStyle: {
@@ -43,7 +44,13 @@ const customizedKeplerGlReducer = keplerGlReducer
       loadOptions: {},
       // interactionConfig: {tooltip:{enabled:true}} // Add additional loaders.gl loader options here
     }
-  });
+  })
+
+  .plugin({
+  	THIS_IS_IN_ALL_CAPS: (state, action) => ({
+  		...state
+  	})
+  })
 
 
 const reducer = combineReducers({

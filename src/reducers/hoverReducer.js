@@ -1,4 +1,9 @@
-import  {visStateUpdaters} from 'kepler.gl/reducers';
+import keplerGlReducer, {visStateUpdaters} from 'kepler.gl/reducers';
+// Root Reducer
+const reducers = combineReducers({
+ keplerGl: keplerGlReducer,
+ app: appReducer
+});
 
 const composedReducer = (state, action) => {
  switch (action.type) {

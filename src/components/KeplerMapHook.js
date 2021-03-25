@@ -1,17 +1,20 @@
 // import KeplerGl from 'kepler.gl';
 import { connect, useSelector, useDispatch } from 'react-redux'
-import {addDataToMap, inputMapStyle} from 'kepler.gl/actions';
 import React, { useEffect } from "react";
-import {injectComponents, PanelHeaderFactory} from 'kepler.gl/components';
+import {addDataToMap, inputMapStyle} from 'kepler.gl/actions';
+import {injectComponents, PanelHeaderFactory, LayerHoverInfoFactory} from 'kepler.gl/components';
 import CustomHeader from './TestHeader'
+import LayerHoverInfo from './LayerHoverInfo'
 // import {replacePanelHeader} from '../factories/panel-header';
 
 
 const myCustomHeaderFactory = () => CustomHeader;
+const myCustomInfoFactory = () => LayerHoverInfo;
 
 // Inject custom header into Kepler.gl,
 const KeplerGl = injectComponents([
-	  [PanelHeaderFactory, myCustomHeaderFactory]
+	  [PanelHeaderFactory, myCustomHeaderFactory],
+	  // [LayerHoverInfoFactory, myCustomInfoFactory]
 	]);
  const KeplerMapHook = () => {
 	const dataState = useSelector ( state => state.latestData.data)

@@ -1,0 +1,1 @@
+export default function LayerHoverInfo(){ return(<div>ERC Percentiles</div>)}

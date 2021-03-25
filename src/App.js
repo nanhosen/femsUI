@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import logo from './logo.svg';
 import './App.css';
-import KeplerMap from './components/KeplerMap.js'
+import ChartSpot from './components/ChartSpot.js'
 import KeplerMapHook from './components/KeplerMapHook.js'
 import { useDispatch, useSelector } from "react-redux"
 
@@ -21,6 +21,7 @@ function App() {
   return (
     <div className="App">
       <KeplerMapHook />
+      <ChartSpot />
     </div>
   );
 }
