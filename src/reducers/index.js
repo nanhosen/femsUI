@@ -1,9 +1,48 @@
 import { combineReducers } from 'redux'
+import {handleActions} from 'redux-actions';
 import latestDataReducer from './getLatestDataReducer'
+import redshiftDataReducer from './getRedshiftDataReducer'
+import {ActionTypes} from 'kepler.gl/actions';
 // import randomReducer from './getRandomReducer'
-import keplerGlReducer from 'kepler.gl/reducers'
+import keplerGlReducer, {combinedUpdaters}  from 'kepler.gl/reducers'
 // import 
 // this is from this example: https://github.com/keplergl/kepler.gl/blob/master/examples/custom-reducer/src/store.js
+
+
+// const appReducer = handleActions({
+//   // listen on kepler.gl map update action to store a copy of viewport in app state
+//   [ActionTypes.LAYER_CLICK]: function (state, action){
+//     console.log('click action action',  action)
+//     console.log('click action payload',  action.payload.info)
+//     console.log('click action state',  state)
+//     return {
+//        ...state,
+//        data: action.payload.info,
+//        keplerGl: {
+//          ...state.keplerGl,
+//          nanette: {
+//             ...state.keplerGl.nanette,
+//             visState: visStateUpdaters.layerClickUpdaters(
+//               state.keplerGl.nanette.visState
+//             )
+//          }
+//        }
+//      }
+//   },
+// }, []);
+
+const appReducer = handleActions({
+  // listen on kepler.gl map update action to store a copy of viewport in app state
+  [ActionTypes.LAYER_CLICK]: function (state, action){
+    console.log('click action action',  action)
+    console.log('click action payload',  action.payload.info)
+    return {
+      ...state,
+      data: action.payload.info
+    }
+  },
+}, []);
+
 const customizedKeplerGlReducer = keplerGlReducer
   .initialState({
   	mapStyle: {
@@ -41,21 +80,29 @@ const customizedKeplerGlReducer = keplerGlReducer
     },
     visState: {
       loaders: [], // Add additional loaders.gl loaders here
-      loadOptions: {},
+      loadOptions: {}
       // interactionConfig: {tooltip:{enabled:true}} // Add additional loaders.gl loader options here
     }
   })
 
-  .plugin({
-  	THIS_IS_IN_ALL_CAPS: (state, action) => ({
-  		...state
-  	})
+  .plugin({ //so i think this is actally an action which is interestingw
+  	// THIS_IS_IN_ALL_CAPS: (state, action) => (
+   //    { ...state }
+   //  )
+    THIS_IS_IN_ALL_CAPS: function(state, action){
+      console.log('in this is in all caps', state, action)
+      return {...state}
+    }
+    
   })
 
 
 const reducer = combineReducers({
 	keplerGl: customizedKeplerGlReducer,
-	latestData: latestDataReducer
+  app: appReducer,
+	latestData: latestDataReducer,
+	redshiftData: redshiftDataReducer,
+  // clickInfo: clickInfoReducer
 })
 
 export default reducer

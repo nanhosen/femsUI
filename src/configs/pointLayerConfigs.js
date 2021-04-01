@@ -1,329 +1,3 @@
-// import KeplerGl from 'kepler.gl';
-import { connect, useSelector, useDispatch } from 'react-redux'
-import React, { useEffect } from "react";
-import {addDataToMap, inputMapStyle, wrapTo } from 'kepler.gl/actions';
-import {createAction} from 'redux-actions';
-import {injectComponents, PanelHeaderFactory, LayerHoverInfoFactory, MapPopoverFactory} from 'kepler.gl/components';
-import CustomHeader from './TestHeader'
-import LayerHoverInfo from './LayerHoverInfo'
-// import { CustomPopoverFactory } from './TestPopoverFactory'
-
-import { config } from '../configs/pointLayerConfigs'
-// import {replacePanelHeader} from '../factories/panel-header';
-
-
-const myCustomHeaderFactory = () => CustomHeader;
-// const myCustomInfoFactory = () => LayerHoverInfo;
-
-const randomAction = createAction('THIS_IS_IN_ALL_CAPS')
-
-// Inject custom header into Kepler.gl,
-const KeplerGl = injectComponents([
-	  [PanelHeaderFactory, myCustomHeaderFactory],
-	  // [MapPopoverFactory, CustomPopoverFactory]
-	  // [LayerHoverInfoFactory, myCustomInfoFactory]
-	]);
- const KeplerMapHook = () => {
-	const dataState = useSelector ( state => state.latestData.data)
-	const redshiftData = useSelector ( state => state.redshiftData)
-	const dispatch = useDispatch()
-
-	useEffect(() => {
-		console.log('in random action thing')
-		dispatch(wrapTo('nanette',randomAction()))
-	},[])
-
-	useEffect(()=>{
-		console.log('redshiftData state changed monthly', dataState)
-		if(redshiftData && redshiftData.monthly){
-			dispatch(addDataToMap({
-				datasets: {
-			  	info: {
-			    	label: 'historical monthly data',
-			    	id: 'historical_monthly'
-			   	},
-			  	data: redshiftData.monthly
-				},
-				// config
-			}))
-		}
-	},[redshiftData.monthly])
-
-	useEffect(()=>{
-		console.log('redshiftData state changed fire season', dataState)
-		if(redshiftData && redshiftData.fire_season){
-			dispatch(addDataToMap({
-				datasets: {
-			  	info: {
-			    	label: 'historical fire_season data',
-			    	id: 'historical_fire_season'
-			   	},
-			  	data: redshiftData.fire_season
-				},
-				// config
-			}))
-		}
-	},[redshiftData.fire_season])
-
-	
-
-	useEffect(() => {
-		console.log('dataState updated fire season', dataState)
-		if(dataState.fireSeason ){
-
-			dispatch(
-			  addDataToMap({
-			    datasets: {
-			      info: {
-			        label: 'ERC Fire Season Percentile Rank',
-			        id: 'fire_season_rank'
-			      },
-			      data: dataState.fireSeason
-			    },
-			    option: {
-			      centerMap: true,
-			      readOnly: false,
-			      keepExistingConfig: false
-			    },
-			    info: {
-			      title: 'Fire Season Percentile Rank',
-			      description: 'fire season ranked percentile'
-			    },
-			    config
-			    // config: {
-			    // 	mapStyle: {styleType: 'nanbette'},
-			    // 	visState: {
-			    // 		// layers: [pointLayerConfig]
-			    // 		layers: [constructedConfig, constructedConfig1, constructedConfig2],
-			    // 		interactionConfig: {
-				   //      tooltip: {
-				   //        fieldsToShow: {
-				   //          fire_season_rank: ['ec'],
-				   //        },
-				   //      enabled: true,
-				   //      },
-				   //      brush: {
-				   //        size: 0.5,
-				   //        enabled: false
-				   //      },
-				   //      geocoder: {
-				   //        enabled: false
-				   //      }
-				   //    }
-			    // 		// layers: [shortWorksConfig]
-			    // 	}
-			    // }
-			  })
-			)
-		}
-
-	},[dataState.fireSeason])
-	useEffect(() => {
-		console.log('dataState updated', dataState)
-		if(dataState.monthly ){
-
-			dispatch(
-			  addDataToMap({
-			    datasets: {
-			      info: {
-			        label: 'ERC Monthly Percentile Rank',
-			        id: 'monthly_percentile_data'
-			      },
-			      data: dataState.monthly
-			    },
-			    option: {
-			      centerMap: true,
-			      readOnly: false,
-			      keepExistingConfig: false
-			    },
-			    info: {
-			      title: 'Taro and Blue',
-			      description: 'This is my map'
-			    },
-			    // config
-			  })
-			)
-		}
-
-	},[dataState.monthly])
-	
-	const mapStylesz = [
-    {
-      id: 'nanbette',
-      label: 'nanette',
-      // url: 'mapbox://styles/mapbox/navigation-guidance-day-v4',
-      url: 'mapbox://styles/nanhosen/ckcxziwe017vi1imsnzt1aucp',
-      // url: 'https://api.mapbox.com/styles/v1/nanhosen/ckcxziwe017vi1imsnzt1aucp.html?fresh=true&title=copy&access_token=pk.eyJ1IjoibmFuaG9zZW4iLCJhIjoiY2ppZGExdDZsMDloNzN3cGVoMjZ0NHR5YyJ9.RYsPZGmajXULk-WtqvBNpQ'
-      // layerGroups: [] // DEFAULT_LAYER_GROUPS
-    }
-  ]; 
-  // const boo = true  
-  
- return ( <KeplerGl
- 	  id="nanette"
- 	  mapboxApiAccessToken={'pk.eyJ1IjoibmFuaG9zZW4iLCJhIjoiY2ppZGExdDZsMDloNzN3cGVoMjZ0NHR5YyJ9.RYsPZGmajXULk-WtqvBNpQ'}
- 	  width={window.innerWidth}
- 	  height={window.innerHeight - 250}
- 	  theme="light"
- 	  mapStyles = {mapStylesz}
-   />)
-
-};
-
-export default KeplerMapHook
-
-// const KeplerMap = props => (
-//   <KeplerGl
-//       id="foo"
-//       mapboxApiAccessToken={token}
-//       width={width}
-//       height={height}/>
-// );
-
-// const mapStateToProps = state => {
-// 	const { latestData } = state
-// 	return { latestData }
-// 	// console.log('state', state)
-// 	// return {state}
-// }
-
-// export default connect(mapStateToProps, null)(KeplerMap)
-// const tooltipConfig = {
-// 	tooltip:{
-//     fieldsToShow: {
-//         monthly_percentile_data: ["sta_id","sta_nm","nfdr_tm", "ec"]
-//     },
-//     enabled: true,
-//     "compareMode": false,
-//     "compareType": "absolute"
-// 	}
-// }
-// const shortWorksConfigMonth = {
-//   type: "point",
-//   config: {
-//     dataId: 'monthly_percentile_data',
-//     hidden: false,
-//     isConfigActive: true,
-//     isVisible: true,
-//     colorScale: 'quantize', 
-//     label: "Monthly ERC points updted",
-//     color: [248, 149, 112],
-//     colorDomain: [0, 100],
-//     columns: {
-//         lat: "latitude",
-//         lng: "longitude",
-//         altitude: ""
-//     },
-//     }
-//   }
-
-  // const shortWorksConfigFireSeason = {
-  // type: "point",
-  // config: {
-  //   dataId: 'fire_season_rank',
-  //   hidden: false,
-  //   isConfigActive: true,
-  //   isVisible: true,
-  //   colorScale: 'quantize', 
-  //   label: "Monthly ERC points updted",
-  //   color: [248, 149, 112],
-  //   colorDomain: [0, 100],
-  //   columns: {
-  //       lat: "latitude",
-  //       lng: "longitude",
-  //       altitude: ""
-  //   },
-  //   }
-  // }
-
-
-const pointLayerConfig = {
-  type: "point",
-  config: {
-    dataId: 'monthly_percentile_data',
-    hidden: false,
-    isConfigActive: true,
-    isVisible: true,
-    colorScale: 'quantize', 
-    label: "Monthly ERC points updted",
-    color: [248, 149, 112],
-    colorDomain: [0, 100],
-    columns: {
-        lat: "latitude",
-        lng: "longitude",
-        altitude: ""
-    },
-    colorField: {
-    	analyzerType: "FLOAT",
-			fieldIdx: 7,
-			format: "",
-			name: "scaled_rank",
-			type: "real"
-		},
-		colorUI: {
-	    color: {
-        customPalette: {
-          name: "color.customPalette",
-          type: "custom",
-          category: "Custom",
-          colors: []
-        },
-        showSketcher: false,
-        showDropdown: false,
-        colorRangeConfig: {
-          type: "all",
-          steps: 6,
-          reversed: false,
-          custom: false
-        }
-	    },
-	    colorRange: {
-        customPalette: {
-          name: "Custom Palette",
-          type: "custom",
-          category: "Custom",
-          colors: [
-            "#009c1f",
-            "#009C1F",
-            "#009C1F",
-            "#009C1F",
-            "#009C1F",
-            "#FFFF00",
-            "#FFFF00",
-            "#FFA700",
-            "#FA0606",
-            "#A706F8"
-          ]
-        },
-        showSketcher: false,
-        showDropdown: false,
-        colorRangeConfig: {
-          type: "all",
-          steps: 10,
-          reversed: false,
-          custom: false
-        }
-	    },
-	    strokeColor: {
-        customPalette: {
-          name: "color.customPalette",
-          type: "custom",
-          category: "Custom",
-          colors: []
-        },
-        showSketcher: false,
-        showDropdown: false,
-        colorRangeConfig: {
-          type: "all",
-          steps: 6,
-          reversed: false,
-          custom: false
-        }
-	    }
-		}
-	}
-}
-
 const constructedConfig = {
 	type: 'point',
 	config: {
@@ -1176,6 +850,742 @@ const constructedConfig2 = {
 	        defaultValue: true,
 	        property: "filled"
 	    }
+	}
+}
+
+const configTemplate = {
+	type: 'point',
+	config: {
+			dataId: '',
+	    label: "",
+	    color: [
+	        221,
+	        178,
+	        124
+	    ],
+	    columns: {
+	        lat: "latitude",
+	        lng: "longitude",
+	        altitude:  ""
+	    },
+	    isVisible: true,
+	    isConfigActive: true,
+	    highlightColor: [
+	        252,
+	        242,
+	        26,
+	        255
+	    ],
+	    hidden: false,
+	    colorField: {
+	        name: "scaled_rank",
+	        format: "",
+	        fieldIdx: 9,
+	        type: "real",
+	        analyzerType: "FLOAT"
+	    },
+	    colorDomain: [
+	        0,
+	        100
+	    ],
+	    colorScale: "quantize",
+	    sizeDomain: [
+	        0,
+	        1
+	    ],
+	    sizeScale: "linear",
+	    sizeField: null,
+	    visConfig: {
+	        radius: 20.8,
+	        fixedRadius: false,
+	        opacity: 0.8,
+	        outline: true,
+	        thickness: 1,
+	        strokeColor: [25, 20, 16],
+	        colorRange: {
+	            name: "Uber Viz Diverging 3.5",
+	            type: "diverging",
+	            category: "Uber",
+	            colors: [
+	                "#009c1f",
+                  "#009C1F",
+                  "#009C1F",
+                  "#009C1F",
+                  "#009C1F",
+                  "#FFFF00",
+                  "#FFFF00",
+                  "#FFA700",
+                  "#FA0606",
+                  "#A706F8"
+	            ]
+	        },
+	        strokeColorRange: {
+	            name: "Global Warming",
+	            type: "sequential",
+	            category: "Uber",
+	            colors: [
+	                "#009c1f",
+                  "#009C1F",
+                  "#009C1F",
+                  "#009C1F",
+                  "#009C1F",
+                  "#FFFF00",
+                  "#FFFF00",
+                  "#FFA700",
+                  "#FA0606",
+                  "#A706F8"
+	            ]
+	        },
+	        radiusRange: [
+	            0,
+	            50
+	        ],
+	        filled: true
+	    },
+	    textLabel: [
+	        {
+	            field: null,
+	            color: [
+	                255,
+	                255,
+	                255
+	            ],
+	            size: 18,
+	            offset: [
+	                0,
+	                0
+	            ],
+	            anchor: "start",
+	            alignment: "center"
+	        }
+	    ],
+	    colorUI: {
+	        color: {
+	            customPalette: {
+	                name: "color.customPalette",
+	                type: "custom",
+	                category: "Custom",
+	                colors: []
+	            },
+	            showSketcher: false,
+	            showDropdown: false,
+	            colorRangeConfig: {
+	                type: "all",
+	                steps: 6,
+	                reversed: false,
+	                custom: false
+	            }
+	        },
+	        colorRange: {
+	            customPalette: {
+	                name: "Custom Palette",
+	                type: "custom",
+	                category: "Custom",
+	                colors: [
+	                    "#009c1f",
+                      "#009C1F",
+                      "#009C1F",
+                      "#009C1F",
+                      "#009C1F",
+                      "#FFFF00",
+                      "#FFFF00",
+                      "#FFA700",
+                      "#FA0606",
+                      "#A706F8"
+	                ]
+	            },
+	            showSketcher: false,
+	            showDropdown: false,
+	            colorRangeConfig: {
+	                type: "all",
+	                steps: 10,
+	                reversed: false,
+	                custom: false
+	            }
+	        }
+	    },
+	    animation: {
+	        enabled: false
+	    },
+	    strokeColorField: null,
+	    strokeColorDomain: [
+	        0,
+	        1
+	    ],
+	    strokeColorScale: "quantile"
+	},
+	visConfigSettings: {
+    radius: {
+	        type: "number",
+	        defaultValue: 10,
+	        label: "layerVisConfigs.radius",
+	        isRanged: false,
+	        range: [
+	            0,
+	            100
+	        ],
+	        step: 0.1,
+	        group: "radius",
+	        property: "radius"
+	    },
+	    fixedRadius: {
+	        defaultValue: false,
+	        type: "boolean",
+	        label: "layerVisConfigs.fixedRadius",
+	        description: "layerVisConfigs.fixedRadiusDescription",
+	        group: "radius",
+	        property: "fixedRadius"
+	    },
+	    opacity: {
+	        type: "number",
+	        defaultValue: 0.8,
+	        label: "layerVisConfigs.opacity",
+	        isRanged: false,
+	        range: [
+	            0,
+	            1
+	        ],
+	        step: 0.01,
+	        group: "color",
+	        property: "opacity"
+	    },
+	    outline: {
+	        type: "boolean",
+	        defaultValue: false,
+	        label: "layer.outline",
+	        property: "outline"
+	    },
+	    thickness: {
+	        type: "number",
+	        defaultValue: 2,
+	        label: "layerVisConfigs.strokeWidth",
+	        isRanged: false,
+	        range: [
+	            0,
+	            100
+	        ],
+	        step: 0.1,
+	        group: "stroke",
+	        property: "thickness"
+	    },
+	    strokeColor: {
+	        type: "color-select",
+	        label: "layerVisConfigs.strokeColor",
+	        defaultValue: null,
+	        group: "color",
+	        property: "strokeColor"
+	    },
+	    colorRange: {
+	        type: "color-range-select",
+	        defaultValue: {
+	            name: "Global Warming",
+	            type: "sequential",
+	            category: "Uber",
+	            colors: [
+	                "#5A1846",
+	                "#900C3F",
+	                "#C70039",
+	                "#E3611C",
+	                "#F1920E",
+	                "#FFC300"
+	            ]
+	        },
+	        label: "layerVisConfigs.colorRange",
+	        group: "color",
+	        property: "colorRange"
+	    },
+	    strokeColorRange: {
+	        type: "color-range-select",
+	        defaultValue: {
+	            name: "Global Warming",
+	            type: "sequential",
+	            category: "Uber",
+	            colors: [
+	                "#5A1846",
+	                "#900C3F",
+	                "#C70039",
+	                "#E3611C",
+	                "#F1920E",
+	                "#FFC300"
+	            ]
+	        },
+	        label: "layerVisConfigs.strokeColorRange",
+	        group: "color",
+	        property: "strokeColorRange"
+	    },
+	    radiusRange: {
+	        type: "number",
+	        defaultValue: [
+	            0,
+	            50
+	        ],
+	        isRanged: true,
+	        range: [
+	            0,
+	            500
+	        ],
+	        step: 0.1,
+	        label: "layerVisConfigs.radiusRange",
+	        group: "radius",
+	        property: "radiusRange"
+	    },
+	    filled: {
+	        type: "boolean",
+	        label: "layer.fillColor",
+	        defaultValue: true,
+	        property: "filled"
+	    }
+	}
+}
+const monthlyLayer = {
+  type: 'point',
+  config: {
+    dataId: 'monthly_percentile_data',
+	    label: "Monthly Percentiles",
+    color: [18, 147, 154],
+    columns: {
+	        lat: "latitude",
+	        lng: "longitude",
+	        altitude:  ""
+	    },
+    isVisible: true,
+    visConfig: {
+      radius: 10,
+      fixedRadius: false,
+      opacity: 0.8,
+      outline: false,
+      thickness: 2,
+      colorRange: {
+        name: 'Ice And Fire',
+        type: 'diverging',
+        category: 'Uber',
+        colors: ['#D50255', '#FEAD54', '#FEEDB1', '#E8FEB5', '#49E3CE', '#0198BD'],
+        reversed: true
+      },
+      radiusRange: [33.6, 96.2],
+      'hi-precision': false
+    }
+  },
+  visualChannels: {
+    colorField: {
+      name: 'Species',
+      type: 'string'
+    },
+    colorScale: 'ordinal',
+    sizeField: {
+      name: 'Age',
+      type: 'integer'
+    },
+    sizeScale: 'sqrt'
+  }
+}
+
+const fireSeasonLayer = {
+  type: 'point',
+  config: {
+    dataId: 'fire_season_rank',
+	  label: "Fire Season Percentiles",
+    color: [18, 147, 154],
+    columns: {
+	        lat: "latitude",
+	        lng: "longitude",
+	        altitude:  ""
+	    },
+    isVisible: true,
+    visConfig: {
+      radius: 10,
+      fixedRadius: false,
+      opacity: 0.8,
+      outline: false,
+      thickness: 2,
+      colorRange: {
+        name: 'Ice And Fire',
+        type: 'diverging',
+        category: 'Uber',
+        colors: ['#D50255', '#FEAD54', '#FEEDB1', '#E8FEB5', '#49E3CE', '#0198BD'],
+        reversed: true
+      },
+      radiusRange: [33.6, 96.2],
+      'hi-precision': false
+    }
+  },
+  visualChannels: {
+    colorField: {
+      name: 'Species',
+      type: 'string'
+    },
+    colorScale: 'ordinal',
+    sizeField: {
+      name: 'Age',
+      type: 'integer'
+    },
+    sizeScale: 'sqrt'
+  }
+}
+
+const historicalLayer = {
+  type: 'point',
+  config: {
+    dataId: 'historical_monthly',
+	    label: "historical monthly data",
+    color: [18, 147, 154],
+    columns: {
+	        lat: "latitude",
+	        lng: "longitude",
+	        altitude:  ""
+	    },
+    isVisible: true,
+    visConfig: {
+      radius: 10,
+      fixedRadius: false,
+      opacity: 0.8,
+      outline: false,
+      thickness: 2,
+      colorRange: {
+        name: 'Ice And Fire',
+        type: 'diverging',
+        category: 'Uber',
+        colors: ['#D50255', '#FEAD54', '#FEEDB1', '#E8FEB5', '#49E3CE', '#0198BD'],
+        reversed: true
+      },
+      radiusRange: [33.6, 96.2],
+      'hi-precision': false
+    }
+  },
+  visualChannels: {
+    colorField: {
+      name: 'Species',
+      type: 'string'
+    },
+    colorScale: 'ordinal',
+    sizeField: {
+      name: 'Age',
+      type: 'integer'
+    },
+    sizeScale: 'sqrt'
+  }
+}
+
+const constructedConfigTest = configTemplate
+constructedConfigTest['config']['dataId'] = 'monthly_percentile_data'
+constructedConfigTest['config']['label'] = 'Monthly Percentiles'
+
+const makeConfigObj = (id, label, colorFieldName, visSetting) => {
+	const newObj = {
+		type: 'point',
+		config: {
+				dataId: id,
+		    label: label,
+		    color: [
+		        221,
+		        178,
+		        124
+		    ],
+		    columns: {
+		        lat: "latitude",
+		        lng: "longitude",
+		        altitude:  ""
+		    },
+		    isVisible: visSetting,
+		    isConfigActive: true,
+		    highlightColor: [
+		        252,
+		        242,
+		        26,
+		        255
+		    ],
+		    hidden: false,
+		    colorField: {
+		        name: colorFieldName,
+		        format: "",
+		        fieldIdx: 9,
+		        type: "real",
+		        analyzerType: "FLOAT"
+		    },
+		    colorDomain: [
+		        0,
+		        100
+		    ],
+		    colorScale: "quantize",
+		    sizeDomain: [
+		        0,
+		        1
+		    ],
+		    sizeScale: "linear",
+		    sizeField: null,
+		    visConfig: {
+		        radius: 20.8,
+		        fixedRadius: false,
+		        opacity: 0.8,
+		        outline: true,
+		        thickness: 1,
+		        strokeColor: [25, 20, 16],
+		        colorRange: {
+		            name: "Uber Viz Diverging 3.5",
+		            type: "diverging",
+		            category: "Uber",
+		            colors: [
+		                "#009c1f",
+	                  "#009C1F",
+	                  "#009C1F",
+	                  "#009C1F",
+	                  "#009C1F",
+	                  "#FFFF00",
+	                  "#FFFF00",
+	                  "#FFA700",
+	                  "#FA0606",
+	                  "#A706F8"
+		            ]
+		        },
+		        strokeColorRange: {
+		            name: "Global Warming",
+		            type: "sequential",
+		            category: "Uber",
+		            colors: [
+		                "#009c1f",
+	                  "#009C1F",
+	                  "#009C1F",
+	                  "#009C1F",
+	                  "#009C1F",
+	                  "#FFFF00",
+	                  "#FFFF00",
+	                  "#FFA700",
+	                  "#FA0606",
+	                  "#A706F8"
+		            ]
+		        },
+		        radiusRange: [
+		            0,
+		            50
+		        ],
+		        filled: true
+		    },
+		    textLabel: [
+		        {
+		            field: null,
+		            color: [
+		                255,
+		                255,
+		                255
+		            ],
+		            size: 18,
+		            offset: [
+		                0,
+		                0
+		            ],
+		            anchor: "start",
+		            alignment: "center"
+		        }
+		    ],
+		    colorUI: {
+		        color: {
+		            customPalette: {
+		                name: "color.customPalette",
+		                type: "custom",
+		                category: "Custom",
+		                colors: []
+		            },
+		            showSketcher: false,
+		            showDropdown: false,
+		            colorRangeConfig: {
+		                type: "all",
+		                steps: 6,
+		                reversed: false,
+		                custom: false
+		            }
+		        },
+		        colorRange: {
+		            customPalette: {
+		                name: "Custom Palette",
+		                type: "custom",
+		                category: "Custom",
+		                colors: [
+		                    "#009c1f",
+	                      "#009C1F",
+	                      "#009C1F",
+	                      "#009C1F",
+	                      "#009C1F",
+	                      "#FFFF00",
+	                      "#FFFF00",
+	                      "#FFA700",
+	                      "#FA0606",
+	                      "#A706F8"
+		                ]
+		            },
+		            showSketcher: false,
+		            showDropdown: false,
+		            colorRangeConfig: {
+		                type: "all",
+		                steps: 10,
+		                reversed: false,
+		                custom: false
+		            }
+		        }
+		    },
+		    animation: {
+		        enabled: false
+		    },
+		    strokeColorField: null,
+		    strokeColorDomain: [
+		        0,
+		        1
+		    ],
+		    strokeColorScale: "quantile"
+		},
+		visConfigSettings: {
+	    radius: {
+		        type: "number",
+		        defaultValue: 10,
+		        label: "layerVisConfigs.radius",
+		        isRanged: false,
+		        range: [
+		            0,
+		            100
+		        ],
+		        step: 0.1,
+		        group: "radius",
+		        property: "radius"
+		    },
+		    fixedRadius: {
+		        defaultValue: false,
+		        type: "boolean",
+		        label: "layerVisConfigs.fixedRadius",
+		        description: "layerVisConfigs.fixedRadiusDescription",
+		        group: "radius",
+		        property: "fixedRadius"
+		    },
+		    opacity: {
+		        type: "number",
+		        defaultValue: 0.8,
+		        label: "layerVisConfigs.opacity",
+		        isRanged: false,
+		        range: [
+		            0,
+		            1
+		        ],
+		        step: 0.01,
+		        group: "color",
+		        property: "opacity"
+		    },
+		    outline: {
+		        type: "boolean",
+		        defaultValue: false,
+		        label: "layer.outline",
+		        property: "outline"
+		    },
+		    thickness: {
+		        type: "number",
+		        defaultValue: 2,
+		        label: "layerVisConfigs.strokeWidth",
+		        isRanged: false,
+		        range: [
+		            0,
+		            100
+		        ],
+		        step: 0.1,
+		        group: "stroke",
+		        property: "thickness"
+		    },
+		    strokeColor: {
+		        type: "color-select",
+		        label: "layerVisConfigs.strokeColor",
+		        defaultValue: null,
+		        group: "color",
+		        property: "strokeColor"
+		    },
+		    colorRange: {
+		        type: "color-range-select",
+		        defaultValue: {
+		            name: "Global Warming",
+		            type: "sequential",
+		            category: "Uber",
+		            colors: [
+		                "#5A1846",
+		                "#900C3F",
+		                "#C70039",
+		                "#E3611C",
+		                "#F1920E",
+		                "#FFC300"
+		            ]
+		        },
+		        label: "layerVisConfigs.colorRange",
+		        group: "color",
+		        property: "colorRange"
+		    },
+		    strokeColorRange: {
+		        type: "color-range-select",
+		        defaultValue: {
+		            name: "Global Warming",
+		            type: "sequential",
+		            category: "Uber",
+		            colors: [
+		                "#5A1846",
+		                "#900C3F",
+		                "#C70039",
+		                "#E3611C",
+		                "#F1920E",
+		                "#FFC300"
+		            ]
+		        },
+		        label: "layerVisConfigs.strokeColorRange",
+		        group: "color",
+		        property: "strokeColorRange"
+		    },
+		    radiusRange: {
+		        type: "number",
+		        defaultValue: [
+		            0,
+		            50
+		        ],
+		        isRanged: true,
+		        range: [
+		            0,
+		            500
+		        ],
+		        step: 0.1,
+		        label: "layerVisConfigs.radiusRange",
+		        group: "radius",
+		        property: "radiusRange"
+		    },
+		    filled: {
+		        type: "boolean",
+		        label: "layer.fillColor",
+		        defaultValue: true,
+		        property: "filled"
+		    }
+		}
+	}
+	return newObj
+}
+
+const monthlyTest = makeConfigObj('monthly_percentile_data', "Monthly Percentiles", "scaled_rank", false)  
+const fireSeasonTest = makeConfigObj('fire_season_rank', "Fire Season Percentiles", "scaled_rank", true)  
+const historicalTestMonthly = makeConfigObj('historical_monthly', 'historical monthly data', "scaled_rank", false)   
+const historicalTestFireSeason = makeConfigObj('historical_fire_season', 'historical fire season data', "scaled_rank", false)   
+
+export const config = {
+	mapStyle: {styleType: 'nanbette'},
+	visState: {
+		// layers: [pointLayerConfig]
+		// layers: [constructedConfig, constructedConfig1, constructedConfig2], // this one works when it's on the fire season config add ddata. if its on monhtly config then it only shows monthly points 
+		layers: [fireSeasonTest, monthlyTest, historicalTestMonthly, historicalTestFireSeason], // this one works when it's on fire season one so must not care about layer order but where it is called for some reason
+		// layers: [monthlyLayer, fireSeasonLayer, historicalLayer],
+		interactionConfig: {
+      tooltip: {
+        fieldsToShow: {
+          fire_season_rank: ['ec'],
+        },
+      enabled: true,
+      },
+      brush: {
+        size: 0.5,
+        enabled: false
+      },
+      geocoder: {
+        enabled: false
+      }
+    }
+		// layers: [shortWorksConfig]
 	}
 }
 
