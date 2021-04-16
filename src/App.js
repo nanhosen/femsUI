@@ -7,13 +7,14 @@ import KeplerMapHook from './components/KeplerMapHook.js'
 import { useDispatch, useSelector } from "react-redux"
 
 import { getLatestData, getRedshiftDataMonthly, getRedshiftDataFireSeason } from './actions' 
+import Container from 'react-bootstrap/Container'
 
 
 function App() {
   const dispatch = useDispatch()
   const dataState = useSelector ( state => state)
   useEffect(() => {
-    console.log(' state changed', dataState)
+    // console.log(' state changed', dataState)
   }, [dataState])
   useEffect(() => {
     // console.log('using the effectt')

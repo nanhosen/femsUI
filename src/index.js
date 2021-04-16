@@ -28,6 +28,7 @@ import {taskMiddleware} from 'react-palm/tasks';
 import reportWebVitals from './reportWebVitals';
 import {enhanceReduxMiddleware} from 'kepler.gl/middleware';
 import reducer from './reducers/index'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // const reducer = combineReducers({
 //   // <-- mount kepler.gl reducer in your app

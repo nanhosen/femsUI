@@ -1,11 +1,14 @@
 import axios from 'axios'
 import { readString, readRemoteFile } from 'react-papaparse'
 import { processCsvData, getFieldsFromData } from 'kepler.gl/processors';
-import { RedshiftDataClient, ExecuteStatementCommand, DescribeTableCommand, ListTablesCommand, ListStatementsCommand, GetStatementResultCommand } from "@aws-sdk/client-redshift-data"
+import { RedshiftDataClient, ExecuteStatementCommand, DescribeStatementCommand, DescribeTableCommand, ListTablesCommand, ListStatementsCommand, GetStatementResultCommand } from "@aws-sdk/client-redshift-data"
 import { jsonToCSV } from 'react-papaparse'
+import { fetchRetry } from '../utils/fetchRetry.js'
+const { REACT_APP_ACCESSKEYID, REACT_APP_SECRETACCESSKEY } = process.env
 
-
+ 
 // redshift-cluster-1.crowqc8szjr0.us-east-2.redshift.amazonaws.com:5439/nfdrs
+
 
 const requestRedshift = async(dbName) =>{
 	try{
@@ -34,8 +37,8 @@ const requestRedshift = async(dbName) =>{
         port: 5439,
         region: 'us-east-2',
         credentials: {
-        	accessKeyId: 'AKIAXFQIKJQDPH5INW25',
-        	secretAccessKey: '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'
+        	accessKeyId: REACT_APP_ACCESSKEYID,
+        	secretAccessKey: REACT_APP_SECRETACCESSKEY
         }
       })
 	    // console.log('client', client)
@@ -54,13 +57,25 @@ const requestRedshift = async(dbName) =>{
 			const commandExecute = new ExecuteStatementCommand(paramsExecute);
 			console.log('going to send command')
 			const respExecute = await client.send(commandExecute)
+			console.log('respExecute', respExecute)
+			console.log('respExecute id', respExecute.Id)
 			const listStatementsCommand = new ListStatementsCommand({})
 			const sendListCommand = await client.send(listStatementsCommand)
+			console.log('sendListCommand', sendListCommand)
 			const resultMetadata = sendListCommand && sendListCommand.Statements && sendListCommand.Statements.filter && sendListCommand.Statements.filter.length> 0 ? sendListCommand.Statements.filter(currStatement => 
 				currStatement.StatementName = statementName
 			) : null
 			const oneIWantId = resultMetadata && resultMetadata.length > 0 ? resultMetadata[0].Id : null
-			const getResultCommand = new GetStatementResultCommand({Id: oneIWantId})
+			// const queryId  = respExecute.Id
+			// const oneIWantId = respExecute.Id
+			const describeStatementResult = await client.send(new DescribeStatementCommand({Id: respExecute.Id}))
+			console.log('about to retry')
+			const fetchRetryResult = await fetchRetry(client, DescribeStatementCommand, {Id: respExecute.Id}, 5, 300, 'actions index')
+			console.log('fetchRetry', fetchRetryResult)
+
+			console.log('desscribeStatementResultttt', describeStatementResult)
+			// console.log('oneIWantId', oneIWantId, 'queryId', queryId)
+			const getResultCommand = new GetStatementResultCommand({Id: respExecute.Id})
 			const sendResultCommand = await client.send(getResultCommand)
 			const fieldOrder = sendResultCommand && sendResultCommand.ColumnMetadata && sendResultCommand.ColumnMetadata.length > 0 ?
 				sendResultCommand.ColumnMetadata.map(curr => curr.label) : null

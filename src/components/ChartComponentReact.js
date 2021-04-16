@@ -2,28 +2,21 @@
 import React, { useEffect, useState } from "react";
 // import { RedshiftDataClient, ExecuteStatementCommand, DescribeTableCommand, ListTablesCommand, ListStatementsCommand, GetStatementResultCommand } from "@aws-sdk/client-redshift-data"
 import CanvasJSReact from '../assets/canvasjs.stock.react'
+import '../styles/react-vis-style.css'
+
+
+import  {
+  XYPlot,
+  XAxis,
+  YAxis,
+  VerticalBarSeries,
+  VerticalBarSeriesCanvas
+} from 'react-vis';
+
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
-const getColor = (val) => {
-	if(val<=50){
-		return 'green'
-	}
-	else if(val > 50 && val <= 60){
-		return 'yellow'
-	}
-	else if (val > 60 && val < 80){
-		return 'orange'
-	}
-	else if(val >= 80 && val < 90){
-		return 'red'
-	}
-	else{
-		return 'purple'
-	}
-}
-
-const ChartComponent = (data) => {
+const ChartComponentReact = (data) => {
 	// const [chartData, setChartData] = useState(data)
 	const [dtps, setDtps] = useState()
 	const [containerProps, setContainerProps] = useState({
@@ -85,7 +78,7 @@ const ChartComponent = (data) => {
 							}
 							dates.push(dateVal)
 							// ranks.push(parseFloat(rankVal))
-							chartRankData.push({x: new Date(dateVal), y: parseFloat(rankVal), color:getColor(parseFloat(rankVal))})
+							chartRankData.push({x: new Date(dateVal), y: parseFloat(rankVal)})
 							chartEcData.push({x: new Date(dateVal), y: parseFloat(ecVal)})
 						}
 					// }
@@ -96,6 +89,7 @@ const ChartComponent = (data) => {
 				setRankValArray(ranks)
 				setChartRankData(chartRankData)
 				setChartEcData(chartEcData)
+				console.log('chartEcData', chartEcData)
 				// console.log('lengths compare set second', dates.length, dateNoDups.length)
 				// setDateValArray(dates)
 			}
@@ -116,13 +110,8 @@ const ChartComponent = (data) => {
 
 	useEffect(() =>{
 		if(chartRankData && chartEcData){
-			const testColorSet = ['#4661EE', '#EC5657','#1BCDD1', '#8FAABB', '#B08BEB', '#3EA0DD','#F5A52A', '#23BFAA','#FAA586', '#EB8CC6'  ]
 			const chOptions = {
       theme: "light2",
-      colorSet: testColorSet,
-      toolTip:{
-      	shared: true
-      },
       title:{
         text: `ERC and Fire Season Percentile Rank ${data.stn}`
       },
@@ -178,7 +167,6 @@ const ChartComponent = (data) => {
           name: "Rank",
           yValueFormatString: "###.#",
           type: "column",
-          // color: 'red',
           dataPoints : chartRankData
         }]
       }],
@@ -258,9 +246,45 @@ const ChartComponent = (data) => {
 	// 	}
 	// },[selected])
 	// console.log('props', props)
-	if(rankValArray && chartOptions){
+	const myDATA = [
+	  {id: '00036', y: 200400, x: 1504121437},
+	  {id: '00036', y: 200350, x: 1504121156},
+	  {id: '00036', y: 200310, x: 1504120874},
+	  {id: '00036', y: 200260, x: 1504120590},
+	  {id: '00036', y: 200210, x: 1504120306},
+	  {id: '00036', y: 200160, x: 1504120024},
+	  {id: '00036', y: 200120, x: 1504119740},
+	  {id: '00036', y: 200070, x: 1504119458},
+	  {id: '00036', y: 200020, x: 1504119177},
+	  {id: '00036', y: 199980, x: 1504118893},
+	  {id: '00036', y: 199930, x: 1504118611},
+	  {id: '00036', y: 199880, x: 1504118330},
+	  {id: '00036', y: 199830, x: 1504118048},
+	  {id: '00036', y: 199790, x: 1504117763},
+	  {id: '00036', y: 199740, x: 1504117481}
+	];
+	const yDomain = myDATA.reduce(
+	  (res, row) => {
+	    return {
+	      max: Math.max(res.max, row.y),
+	      min: Math.min(res.min, row.y)
+	    };
+	  },
+	  {max: -Infinity, min: Infinity}
+	);
+	if(chartEcData){
 		return(
-			<CanvasJSStockChart containerProps={containerProps} options = {chartOptions} />
+			<XYPlot
+          margin={{left: 75}}
+          xType="time"
+          width={window.innerHeight}
+          height={300}
+          yDomain={[0, 100]}
+        >
+          <VerticalBarSeries className="vertical-bar-series-example" data={chartEcData} />
+          <XAxis />
+          <YAxis />
+        </XYPlot>
 		)
 	}
 	else{
@@ -270,4 +294,4 @@ const ChartComponent = (data) => {
 	}
 }
 
-export default ChartComponent
+export default ChartComponentReact
